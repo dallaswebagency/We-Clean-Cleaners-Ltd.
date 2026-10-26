@@ -147,6 +147,9 @@ h2{font-family:var(--display);font-weight:800;color:var(--navy);font-size:clamp(
 .panel__img{aspect-ratio:16/10;background:var(--sky);position:relative;overflow:hidden}
 .panel__img img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:opacity .35s ease,transform .6s ease}
 .panel__img.contain img{object-fit:contain;padding:22px}
+.panel__img.noimg{background:linear-gradient(135deg,var(--navy),var(--blue))}
+.panel__img.noimg img{display:none}
+.panel__img.noimg::after{content:"";position:absolute;inset:0;background:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 120'><path d='M16 58 60 18l44 40M26 52v50h68V52' fill='none' stroke='white' stroke-width='5' stroke-linecap='round' stroke-linejoin='round'/><path d='M92 14c1.4 11 8 17.6 19 19-11 1.4-17.600 8-19 19-1.400-11-8-17.600-19-19 11-1.400 17.600-8 19-19z' fill='%2300A8E8'/></svg>") center/min(34%,190px) no-repeat}
 .panel.swap .panel__img img{opacity:0;transform:scale(1.04)}
 .panel__body{padding:clamp(22px,3vw,38px)}
 .panel__num{font-weight:700;font-size:.8rem;letter-spacing:.16em;text-transform:uppercase;color:var(--cyan)}
@@ -155,6 +158,7 @@ h2{font-family:var(--display);font-weight:800;color:var(--navy);font-size:clamp(
 .chips{display:flex;flex-wrap:wrap;gap:8px;margin:14px 0 4px}
 .chips li{background:var(--sky);color:var(--navy);font-weight:600;font-size:.88rem;padding:7px 14px;border-radius:999px}
 .note{display:inline-flex;align-items:center;gap:8px;margin-top:6px;font-weight:700;font-size:.88rem;color:var(--blue)}
+.note[hidden]{display:none}
 .note svg{width:16px;height:16px;color:var(--cyan)}
 .panel .btn{margin-top:22px}
 
@@ -591,7 +595,12 @@ h2{font-family:var(--display);font-weight:800;color:var(--navy);font-size:clamp(
   function show(k){
     var d=S[k]; if(!d) return;
     function paint(){
-      img.onerror=function(){ if(d.fallback){ img.onerror=null; img.src=d.fallback; box.classList.toggle('contain',!!d.contain); } };
+      var tried=false;
+      img.onerror=function(){
+        if(d.fallback && !tried){ tried=true; img.src=d.fallback; box.classList.toggle('contain',!!d.contain); }
+        else { img.onerror=null; box.classList.add('noimg'); }
+      };
+      box.classList.remove('noimg');
       img.src=d.img; img.alt=d.t;
       box.classList.remove('contain');
       num.textContent=d.n+' / 11';
